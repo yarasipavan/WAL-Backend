@@ -1,0 +1,70 @@
+GET http://localhost:5000/user-api/users-data
+###
+
+GET http://localhost:5000/user-api/user/kalyan
+
+
+###
+POST http://localhost:5000/user-api/create-user
+Content-Type: application/json
+
+{
+  "username":"kalyan",
+  "age": 24,
+  "email": "pavan@gmail.com"
+}
+
+###
+
+PUT http://localhost:5000/user-api/modify-user
+Content-Type: application/json
+
+{
+  "username":"kalyan",
+  "age": 24,
+  "email": "kalyan@gmail.com"
+}
+
+###
+DELETE http://localhost:5000/user-api/delete-user/kalyan
+
+###
+GET http://localhost:5000/product-api/products
+
+
+
+
+
+
+
+###
+GET http://localhost:5000/product-api/products
+
+###
+GET http://localhost:5000/product-api/product/Product1
+
+###
+POST http://localhost:5000/product-api/add-product
+Content-Type: application/json
+
+{
+  "productId":"Product2",
+  "name":"One",
+  "price":40,
+  "brand":"brand2"
+}
+
+###
+PUT http://localhost:5000/product-api/update-product
+Content-Type: application/json
+
+{
+  "productId":"Product1",
+  "name":"One",
+  "price":20,
+  "brand":"brand1"
+
+}
+
+###
+DELETE http://localhost:5000/product-api/delete/Product2
