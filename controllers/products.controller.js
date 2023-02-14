@@ -1,75 +1,86 @@
-let products = [
-  {
-    productId: "Product1",
-    name: "One",
-    price: 40,
-    brand: "brand1",
-  },
-];
+//import connection obj
+const connection = require("../database/db.config");
 
 //get all products
 const getAllProducts = (req, res) => {
-  res.send({ message: "All Products", payload: products });
+  connection.query("select * from products", (err, products) => {
+    if (err) {
+      console.log("Error while getting products", err);
+      res.send({ message: err.message });
+    } else res.send({ message: "products", payload: products });
+  });
 };
 
 //get product by productId
 const getProductByProductId = (req, res) => {
   //get the productid from URL
-  let productIdFromUrl = req.params.productId;
-  console.log(productIdFromUrl);
-
-  //search for the productId if found send the product else send the product not found with that product id
-  let product = products.find(
-    (productObj) => productObj.productId == productIdFromUrl
+  let productIdFromUrl = Number(req.params.productId);
+  //get the product details with product id
+  connection.query(
+    "select * from products where product_id=?",
+    productIdFromUrl,
+    (err, products) => {
+      if (err) {
+        console.log("Error while getting product", err);
+      } else {
+        res.send({ message: "product", payload: products[0] });
+      }
+    }
   );
-  console.log(product);
-  if (product === undefined) {
-    res.send({ message: "No product Exist with that productId" });
-  } else {
-    res.send({ message: "Product found", payload: product });
-  }
 };
 
 //create/add new product
 const addNewProduct = (req, res) => {
-  let newProduct = req.body;
-  //let check the productId is already existed or not
-  let productExist = products.find(
-    (productObj) => productObj.productId === newProduct.productId
+  //get the product details need to add from req body
+  let {
+    product_id,
+    product_name,
+    product_price,
+    product_date_of_manufactured,
+  } = req.body;
+  product_date_of_manufactured = new Date(product_date_of_manufactured);
+  connection.query(
+    "insert into products set product_id=?,product_name=?,product_price=?,product_date_of_manufactured=?",
+    [product_id, product_name, product_price, product_date_of_manufactured],
+    (err, result) => {
+      if (err) {
+        console.log("Error while creating product: ", err);
+        res.send({ message: err.message });
+      } else {
+        res.send({ message: "Product added successfully" });
+      }
+    }
   );
-  //if not exist then add/insert
-  if (productExist === undefined) {
-    products.push(newProduct);
-    //send response
-    res.send({ message: "Successfully created" });
-  }
-  //else send the same to client
-  else {
-    res.send({ message: "Product is already exixted with that productId" });
-  }
 };
 
 //modify product
 const modifyProduct = (req, res) => {
   //get the modify product from req
-  let modifiedProduct = req.body;
-
-  //find index of product need to be modify
-
-  let indexOfModifyProduct = products.findIndex(
-    (productObj) => modifiedProduct.productId === productObj.productId
+  let {
+    product_id,
+    product_name,
+    product_price,
+    product_date_of_manufactured,
+  } = req.body;
+  //update the product by productId
+  connection.query(
+    "update products set product_id=?,product_name=?,product_price=?,product_date_of_manufactured=? where product_id=?",
+    [
+      product_id,
+      product_name,
+      product_price,
+      product_date_of_manufactured,
+      product_id,
+    ],
+    (err, result) => {
+      if (err) {
+        console.log("Error while updating product: ", err);
+        res.send({ message: err.message });
+      } else {
+        res.send({ message: "Product modified successfully" });
+      }
+    }
   );
-
-  // if index=-1 i.e not exist send the same to client
-  if (indexOfModifyProduct === -1) {
-    res.send({ message: "No product with that product Id to Modify" });
-  }
-  //else modify/update
-  else {
-    //update
-    products.splice(indexOfModifyProduct, 1, modifiedProduct);
-    res.send({ message: "Successfully Modified" });
-  }
 };
 
 //delete product
@@ -77,21 +88,23 @@ const deleteProductByProductId = (req, res) => {
   //get the productId from url
   let productIdFromUrl = req.params.productId;
 
-  //find the index of product need to be delete
-  let indexOfDeleteProduct = products.findIndex(
-    (productObj) => productIdFromUrl === productObj.productId
+  ///delete the product from db
+  connection.query(
+    "delete from products where product_id=?",
+    productIdFromUrl,
+    (err, result) => {
+      if (err) {
+        console.log("Error while deleteing product: ", err);
+        res.send({ message: err.message });
+      } else {
+        if (result.affectedRows == 0)
+          res.send({ message: "Product not found to delete " });
+        else {
+          res.send({ message: "Product Deleted" });
+        }
+      }
+    }
   );
-
-  //if index=-1 i.e product is not existed , send the same
-  if (indexOfDeleteProduct === -1) {
-    res.send({ message: "No product is exist with that product to delete" });
-  }
-  //else delete the product
-  else {
-    //delete
-    products.splice(indexOfDeleteProduct, 1);
-    res.send({ message: "Successfully deleted" });
-  }
 };
 
 module.exports = {

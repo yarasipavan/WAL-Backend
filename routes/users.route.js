@@ -19,13 +19,13 @@ const {
 userApp.get("/users-data", getAllUsers);
 
 // route to get the userDetails by username
-userApp.get("/user/:userName", getUserByUserName);
+userApp.get("/user/:empId", getUserByUserName);
 
 userApp.post("/create-user", createNewUser);
 
 userApp.put("/modify-user", modifyUser);
 
-userApp.delete("/delete-user/:userName", deleleUserByUserName);
+userApp.delete("/delete-user/:empId", deleleUserByUserName);
 
 //export router
 module.exports = userApp;
